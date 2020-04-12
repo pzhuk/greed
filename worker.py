@@ -368,7 +368,7 @@ class ChatWorker(threading.Thread):
             keyboard = [[telegram.KeyboardButton(strings.menu_order)],
                         [telegram.KeyboardButton(strings.menu_order_status)],
                         [telegram.KeyboardButton(strings.menu_add_credit)],
-                        [telegram.KeyboardButton(strings.menu_help), telegram.KeyboardButton(strings.menu_bot_info)]]
+                        [telegram.KeyboardButton(strings.menu_help)]]
             # Send the previously created keyboard to the user (ensuring it can be clicked only 1 time)
             self.bot.send_message(self.chat.id,
                                   strings.conversation_open_user_menu.format(credit=utils.Price(self.user.credit)),
@@ -554,11 +554,8 @@ class ChatWorker(threading.Thread):
                     self.__display_products_from_category()
                     final_msg = self.__display_cart_final_msg()
 
-        # Create an inline keyboard with a single skip button
-        cancel = telegram.InlineKeyboardMarkup([[telegram.InlineKeyboardButton(strings.menu_skip,
-                                                                               callback_data="cmd_cancel")]])
         # Ask if the user wants to add notes to the order
-        self.bot.send_message(self.chat.id, strings.ask_order_notes, reply_markup=cancel)
+        self.bot.send_message(self.chat.id, strings.ask_order_notes)
         # Wait for user input
         notes = self.__wait_for_regex(r"(.*)", cancellable=True)
         # Create a new Order
@@ -869,6 +866,7 @@ class ChatWorker(threading.Thread):
         options.insert(0, strings.menu_cancel)
         options.insert(1, strings.menu_edit_category)
         options.insert(2, strings.menu_remove_category)
+        options.insert(3, strings.menu_make_category_default)
         keyboard = [[telegram.KeyboardButton(option)] for option in options]
         self.bot.send_message(self.chat.id, strings.conversation_admin_select_category,
                               reply_markup=telegram.ReplyKeyboardMarkup(keyboard, one_time_keyboard=True))
@@ -883,7 +881,6 @@ class ChatWorker(threading.Thread):
             category.name=name
             self.session.commit()
             self.bot.send_message(self.chat.id, strings.conversation_rename_category_succeed)
-            return
         elif selection == strings.menu_remove_category:
             products = self.session.query(db.Product) \
                 .filter_by(deleted=False, category_id=category.id) \
@@ -893,6 +890,14 @@ class ChatWorker(threading.Thread):
             else:
                 self.session.delete(category)
                 self.bot.send_message(self.chat.id, strings.conversation_remove_category_succeed)
+        elif selection == strings.menu_make_category_default:
+            dc = self.session.query(db.ProductCategory) \
+                .filter_by(deleted=False, default=True) \
+                .one()
+            dc.default = False
+            category.default = True
+            self.session.commit()
+            self.bot.send_message(self.chat.id, strings.conversation_default_category_succeed)
 
     def __products_menu(self):
         """Display the admin menu to select a product to edit."""
