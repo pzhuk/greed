@@ -149,6 +149,33 @@ menu_credit_card = "💳 Кредитной картой"
 # Admin menu: products
 menu_products = "📝️ Продукты"
 
+# Admin menu categories
+menu_categories = "Категории"
+
+# Admin menu rename category
+menu_edit_category = "Переименовать"
+
+# Admin menu remove category
+menu_remove_category = "Удалить"
+
+# Admin - choose new category name
+menu_rename_category = "Укажите новое имя"
+
+# Admin - succesfully renamed category
+conversation_rename_category_succeed = "Успешно переименовано"
+
+# Admin - can't delete category with products
+conversation_delete_category_products = "Нельзя удалить категорию, в которой есть товары"
+
+# Admin - category removal succeeds
+conversation_remove_category_succeed = "Успешно удалено"
+
+# Admin - which action to take to category
+conversation_admin_select_category = "Что нужно сделать с категорией?"
+
+# Admin - such category already exist
+conversation_admin_category_exist = "Такая категория уже существует"
+
 # Admin menu: orders
 menu_orders = "📦 Заказы"
 
@@ -215,6 +242,9 @@ menu_csv = "📄 .csv"
 # Menu: edit admins list
 menu_edit_admins = "🏵 Изменить менеджеров"
 
+# Menu: change category
+menu_category_change = "Выбрать категорию товаров"
+
 # Emoji: unprocessed order
 emoji_not_processed = "*️⃣"
 
@@ -241,6 +271,9 @@ text_refunded = "возмещен"
 
 # Add product: name?
 ask_product_name = "Как назовем продукт?"
+
+# Add product: category?
+ask_category_name = "Выберите существующую категорию, или введите название, чтобы создать новую"
 
 # Add product: description?
 ask_product_description = "Каким будет описание продукта?"
@@ -299,7 +332,7 @@ downloading_image = "Я загружаю фото!\n" \
                     "Это может занять некоторое время...!\n" \
                     "Я не смогу отвечать, пока идет загрузка."
 
-downloading_image_failed = "Ошибка при загрузке изображения" \
+downloading_image_failed = "Ошибка при загрузке изображения " \
                            "Попробуйте еще раз..."
 
 # Edit product: current value

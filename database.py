@@ -81,8 +81,25 @@ class User(TableDeclarativeBase):
         return f"<User {self} having {self.credit} credit>"
 
 
+class ProductCategory(TableDeclarativeBase):
+    __tablename__ = 'category'
+    # Category id
+    id = Column(Integer, primary_key=True)
+    # Category name
+    name = Column(String)
+    # If category was deleted
+    deleted = Column(Boolean, default=False)
+    # If category is default one
+    default = Column(Boolean, default=False)
+
+    def identifiable_str(self):
+        """Describe category, used for buttons definition in edit menu."""
+        return f"category_{self.id} ({self.name})"
+
 class Product(TableDeclarativeBase):
     """A purchasable product."""
+    # Extra table parameters
+    __tablename__ = "products"
 
     # Product id
     id = Column(Integer, primary_key=True)
@@ -93,12 +110,12 @@ class Product(TableDeclarativeBase):
     # Product price, if null product is not for sale
     price = Column(Integer)
     # Image data
-    image = Column(LargeBinary)
+    image = Column(String, nullable=True)
     # Product has been deleted
     deleted = Column(Boolean, nullable=False)
-
-    # Extra table parameters
-    __tablename__ = "products"
+    # Product category
+    category_id = Column(Integer, ForeignKey('category.id'), index=True)
+    category = relationship("ProductCategory", backref="products")
 
     # No __init__ is needed, the default one is sufficient
 
@@ -124,6 +141,7 @@ class Product(TableDeclarativeBase):
     def __repr__(self):
         return f"<Product {self.name}>"
 
+    #DEPRECATED
     def send_as_message(self, chat_id: int) -> dict:
         """Send a message containing the product data."""
         if self.image is None:
@@ -139,7 +157,7 @@ class Product(TableDeclarativeBase):
                                       "parse_mode": "HTML"})
         return r.json()
 
-    def set_image(self, file: telegram.File):
+    def DEPRECATED_set_image(self, file: telegram.File):
         """Download an image from Telegram and store it in the image column.
         This is a slow blocking function. Try to avoid calling it directly, use a thread if possible."""
         # Download the photo through a get request
