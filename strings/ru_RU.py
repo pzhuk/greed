@@ -363,7 +363,7 @@ payment_cc_amount = "На какую сумму пополнить Ваш кош
 payment_invoice_title = "Пополнение"
 
 # Payment: add funds invoice description
-payment_invoice_description = "Оплата этого счета добавит {amount} в Ваш кошелек."
+payment_invoice_description = "Оплата в магазине \"Рибацька пошта\" {amount} грн."
 
 # Payment: label of the labeled price on the invoice
 payment_invoice_label = "Платеж"

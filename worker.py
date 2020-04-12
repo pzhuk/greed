@@ -756,8 +756,9 @@ class ChatWorker(threading.Thread):
                               need_name=configloader.config["Credit Card"]["name_required"] == "yes",
                               need_email=configloader.config["Credit Card"]["email_required"] == "yes",
                               need_phone_number=configloader.config["Credit Card"]["phone_required"] == "yes",
-                              need_shipping_address=True
-                              reply_markup=inline_keyboard)
+                              need_shipping_address=True,
+                              #reply_markup=inline_keyboard
+                              )
         # Wait for the precheckout query
         precheckoutquery = self.__wait_for_precheckoutquery(cancellable=True)
         # Check if the user has cancelled the invoice
