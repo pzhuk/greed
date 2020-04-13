@@ -141,31 +141,6 @@ class Product(TableDeclarativeBase):
     def __repr__(self):
         return f"<Product {self.name}>"
 
-    #DEPRECATED
-    def send_as_message(self, chat_id: int) -> dict:
-        """Send a message containing the product data."""
-        if self.image is None:
-            r = requests.get(f"https://api.telegram.org/bot{configloader.config['Telegram']['token']}/sendMessage",
-                             params={"chat_id": chat_id,
-                                     "text": self.text(),
-                                     "parse_mode": "HTML"})
-        else:
-            r = requests.post(f"https://api.telegram.org/bot{configloader.config['Telegram']['token']}/sendPhoto",
-                              files={"photo": self.image},
-                              params={"chat_id": chat_id,
-                                      "caption": self.text(),
-                                      "parse_mode": "HTML"})
-        return r.json()
-
-    def DEPRECATED_set_image(self, file: telegram.File):
-        """Download an image from Telegram and store it in the image column.
-        This is a slow blocking function. Try to avoid calling it directly, use a thread if possible."""
-        # Download the photo through a get request
-        r = requests.get(file.file_path)
-        # Store the photo in the database record
-        self.image = r.content
-
-
 class Transaction(TableDeclarativeBase):
     """A greed wallet transaction.
     Wallet credit ISN'T calculated from these, but they can be used to recalculate it."""

@@ -171,8 +171,14 @@ conversation_rename_category_succeed = "Успешно переименован�
 # Admin - can't delete category with products
 conversation_delete_category_products = "Нельзя удалить категорию, в которой есть товары"
 
+# Admin - assign new default category
+conversation_reassign_default_category = "Удаляемая категория является основной. Выберите, или создайте новую основную категорию"
+
 # Admin - category removal succeeds
-conversation_remove_category_succeed = "Успешно удалено"
+conversation_remove_category_succeed = "Категория {name} успешно удалена"
+
+# Admin - new default category was assigned
+conversation_new_assigned_category = "Теперь категория {name} будет основной"
 
 # Admin - which action to take to category
 conversation_admin_select_category = "Что нужно сделать с категорией?"

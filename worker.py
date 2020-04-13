@@ -890,8 +890,14 @@ class ChatWorker(threading.Thread):
             if products > 0:
                 self.bot.send_message(self.chat.id, strings.conversation_delete_category_products)
             else:
+                if category.default:
+                    self.bot.send_message(self.chat.id, strings.conversation_reassign_default_category)
+                    newdc = self.__create_product_category()
+                    self.bot.send_message(self.chat.id, strings.conversation_new_assigned_category.format(name=newdc.name))
+                    newdc.default = True
+                self.bot.send_message(self.chat.id, strings.conversation_remove_category_succeed.format(name=category.name))
                 self.session.delete(category)
-                self.bot.send_message(self.chat.id, strings.conversation_remove_category_succeed)
+                self.session.commit()
         elif selection == strings.menu_make_category_default:
             dc = self.session.query(db.ProductCategory) \
                 .filter_by(deleted=False, default=True) \
