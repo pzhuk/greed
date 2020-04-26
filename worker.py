@@ -124,7 +124,7 @@ class ChatWorker(threading.Thread):
         try:
             # If the user is not an admin, send him to the user menu
             if self.admin is None:
-                self.__user_menu()
+                self.__order_menu()
             # If the user is an admin, send him to the admin menu
             else:
                 # Clear the live orders flag
@@ -480,30 +480,47 @@ class ChatWorker(threading.Thread):
     def __select_product_category(self):
         categories = self.session.query(db.ProductCategory).filter_by(deleted=False).all()
         # Add to the list all the categories
-        keyboard_buttons = []
-        for category in categories:
-            keyboard_buttons.append([category.identifiable_str()])
+
+        options = [category.name for category in categories]
+        keyboard_buttons = [[telegram.KeyboardButton(option)] for option in options]
+
+        keyboard_buttons.append([telegram.KeyboardButton(strings.menu_order_status), telegram.KeyboardButton(strings.menu_contact_shopkeeper)])
+        options.append(strings.menu_order_status)
+        options.append(strings.menu_contact_shopkeeper)
+
+
         # Create the keyboard
         keyboard = telegram.ReplyKeyboardMarkup(keyboard_buttons, one_time_keyboard=True)
-        self.bot.send_message(self.chat.id, strings.ask_category_name, reply_markup=keyboard)   #TODO add translation
-        response = self.__wait_for_regex(r"(.*)")
-        # Return if canceled
-        if isinstance(response, CancelSignal):
-            return response
 
-        category_match = re.search('category_([0-9]+)', response)
-        # Search for such category if id matched
-        if category_match:
-            return self.session.query(db.ProductCategory) \
-                .filter_by(id=int(category_match.group(1))) \
-                .one()
-        else:
-            return response
+        while True:
+            self.bot.send_message(self.chat.id, strings.select_category_name, reply_markup=keyboard)
+            response = self.__wait_for_specific_message(options, cancellable=True)
+
+            # Return if canceled
+            if isinstance(response, CancelSignal):
+                return response
+
+            if response == strings.menu_order_status:
+                self.__order_status()
+                continue
+
+            if response == strings.menu_contact_shopkeeper:
+                self.bot.send_message(self.chat.id, strings.contact_shopkeeper)
+                continue
+
+            category = self.session.query(db.ProductCategory) \
+                .filter_by(name=str(response)) \
+                .one_or_none()
+
+            if category:
+                return category
 
     def __order_menu(self):
         """User menu to order products from the shop."""
-        # Display products from default category
-        self.__display_products_from_category()
+        # Ask to select category
+        category = self.__select_product_category()
+
+        self.__display_products_from_category(category)
         # Display final summary message
         final_msg = self.__display_cart_final_msg()
         # Wait for user input
@@ -754,9 +771,9 @@ class ChatWorker(threading.Thread):
                               currency=configloader.config["Payments"]["currency"],
                               prices=prices,
                               need_name=configloader.config["Credit Card"]["name_required"] == "yes",
-                              need_email=configloader.config["Credit Card"]["email_required"] == "yes",
+#                              need_email=configloader.config["Credit Card"]["email_required"] == "yes",
                               need_phone_number=configloader.config["Credit Card"]["phone_required"] == "yes",
-                              need_shipping_address=True,
+#                              need_shipping_address=True,
                               #reply_markup=inline_keyboard
                               )
         # Wait for the precheckout query
@@ -845,7 +862,7 @@ class ChatWorker(threading.Thread):
                 # Tell the user how to go back to admin menu
                 self.bot.send_message(self.chat.id, strings.conversation_switch_to_user_mode)
                 # Start the bot in user mode
-                self.__user_menu()
+                self.__order_menu()
             # If the user has selected the Add Admin option...
             elif selection == strings.menu_edit_admins:
                 # Open the edit admin menu

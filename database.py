@@ -92,10 +92,6 @@ class ProductCategory(TableDeclarativeBase):
     # If category is default one
     default = Column(Boolean, default=False)
 
-    def identifiable_str(self):
-        """Describe category, used for buttons definition in edit menu."""
-        return f"category_{self.id} ({self.name})"
-
 class Product(TableDeclarativeBase):
     """A purchasable product."""
     # Extra table parameters
